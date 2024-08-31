@@ -81,6 +81,9 @@
 
             try {
                 let response = await fetch('https://meloboom.com/en/search/' + encodeURIComponent(title));
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
                 let text = await response.text();
                 
                 // Parse HTML string to DOM
@@ -89,11 +92,16 @@
                 
                 // Select ringtones
                 let ringtones = [];
-                doc.querySelectorAll('#__next > main > section > div.jsx-2244708474.container > div > div > div > div:nth-child(4) > div > div > div > ul > li').forEach(item => {
-                    let title = item.querySelector('h4').textContent;
-                    let source = 'https://meloboom.com/' + item.querySelector('a').getAttribute('href');
-                    let audio = item.querySelector('audio').getAttribute('src');
-                    ringtones.push({ title, source, audio });
+                doc.querySelectorAll('li').forEach(item => {
+                    let titleElement = item.querySelector('h4');
+                    let audioElement = item.querySelector('audio');
+                    if (titleElement && audioElement) {
+                        let ringtone = {
+                            title: titleElement.textContent,
+                            audio: audioElement.getAttribute('src')
+                        };
+                        ringtones.push(ringtone);
+                    }
                 });
 
                 ringtoneContainer.innerHTML = '';
