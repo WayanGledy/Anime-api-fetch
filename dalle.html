@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dalle API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h1 {
+            margin: 0;
+        }
+        .menu-button {
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .dashboard {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            background: #ffffff;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.5);
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 1000;
+            max-height: 100%;
+            overflow-y: auto;
+        }
+        .dashboard h2 {
+            text-align: center;
+            margin-top: 0;
+        }
+        .dashboard a {
+            display: block;
+            margin: 10px 0;
+            text-align: center;
+            padding: 10px;
+            background-color: #6200ea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .dashboard a:hover {
+            background-color: #3700b3;
+        }
+        .dashboard .close {
+            display: block;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            background-color: #f44336;
+            color: white;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            text-align: center;
+        }
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #3700b3;
+        }
+        #searchContainer {
+            margin-top: 20px;
+        }
+        #searchInput {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 200px;
+        }
+        #searchButton {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            background-color: #6200ea;
+            color: white;
+            cursor: pointer;
+        }
+        #searchButton:hover {
+            background-color: #3700b3;
+        }
+        #searchResult {
+            margin-top: 20px;
+        }
+        #imageContainer {
+            margin-top: 20px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        p {
+            font-size: 18px;
+            color: #555;
+        }
+        #downloadButton {
+            display: none;
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        #downloadButton:hover {
+            background-color: #005f73;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Dalle API</h1>
+        <div class="menu-button" onclick="toggleDashboard()">☰</div>
+    </header>
+
+    <div class="container">
+        <h3>[DALLE API]</h3>
+        <div class="button-container">
+            <button id="fetchDalleBtn">Generate Image</button>
+        </div>
+        <div id="searchContainer">
+            <input type="text" id="promptInput" placeholder="Enter prompt">
+            <button id="generateButton">Generate</button>
+        </div>
+        <button id="downloadButton">Download Gambar</button>
+        <div id="searchResult"></div>
+        <div id="imageContainer">
+            <!-- Gambar akan ditampilkan di sini -->
+        </div>
+    </div>
+
+    <div class="dashboard" id="dashboard">
+        <div class="close" onclick="toggleDashboard()">[back]</div>
+        <h2>DashBoard</h2>
+        <a href="index.html">Anime API</a>
+        <a href="karina.html">Karina Api</a>
+        <a href="naruto.html">Naruto Api</a>
+        <a href="pokemon.html">API Pokemon</a>
+        <a href="dalle.html">API dalle</a>
+        <a href="https://wa.me/6283834202329">WhatsApp</a>
+        <a href="https://www.facebook.com/profile.php?id=100087881746207">Facebook</a>
+    </div>
+
+    <script>
+        function toggleDashboard() {
+            const dashboard = document.getElementById('dashboard');
+            dashboard.style.display = dashboard.style.display === 'block' ? 'none' : 'block';
+        }
+
+        async function generateImage(prompt) {
+            const imageContainer = document.getElementById('imageContainer');
+            const downloadButton = document.getElementById('downloadButton');
+            imageContainer.innerHTML = '<p>📌 Wait...</p>';
+
+            try {
+                let response = await fetch('https://api.example.com/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt })
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                let data = await response.json();
+                let generatedImage = data.url;
+
+                imageContainer.innerHTML = `
+                    <img id="generatedImage" src="${generatedImage}" alt="Generated Image">
+                    <p>*[Generated Image]*</p>
+                `;
+                downloadButton.style.display = 'block';
+                downloadButton.onclick = () => downloadImage(generatedImage, 'Generated Image');
+            } catch (error) {
+                console.error('Error generating image:', error);
+                imageContainer.innerHTML = '<p>❌ Error generating image, please try again later.</p>';
+                downloadButton.style.display = 'none';
+            }
+        }
+
+        function downloadImage(url, imageName) {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${imageName}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        document.getElementById('generateButton').addEventListener('click', function() {
+            const prompt = document.getElementById('promptInput').value;
+            if (prompt) {
+                generateImage(prompt);
+            } else {
+                alert('Please enter a prompt.');
+            }
+        });
+
+        document.getElementById('fetchDalleBtn').addEventListener('click', function() {
+            const prompt = 'A futuristic cityscape';  // You can change this to any default prompt you like
+            generateImage(prompt);
+        });
+    </script>
+</body>
+</html>

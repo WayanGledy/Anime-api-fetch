@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #6200ea;
+            color: white;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #3700b3;
+            transform: scale(1.05);
+        }
+
+        #searchContainer {
+            margin-top: 20px;
+        }
+
+        #searchInput {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 200px;
+        }
+
+        #searchButton {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            background-color: #6200ea;
+            color: white;
+            cursor: pointer;
+        }
+
+        #searchButton:hover {
+            background-color: #3700b3;
+        }
+
+        #searchResult {
+            margin-top: 20px;
+        }
+
+        #imageContainer {
+            margin-top: 20px;
+            height: 20px;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        p {
+            font-size: 18px;
+            color: #555;
+        }
+
+        #downloadButton {
+            display: none;
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        #downloadButton:hover {
+            background-color: #005f73;
+        }
+
+        /* Navbar styles */
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #6200ea;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            text-align: center;
+            flex-grow: 1;
+            padding: 10px 0;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar a:hover {
+            transform: translateY(-5px);
+        }
+
+        .navbar a.active {
+            border-top: 2px solid #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Anime API</h1>
+    </header>
+
+    <div class="container">
+        <h3>[ANIME API]</h3>
+        <div class="button-container">
+            <button id="fetchWaifuBtn">Anime Waifu</button>
+            <button id="fetchNekoBtn">Anime Neko</button>
+            <button id="fetchMeguminBtn">Anime Megumin</button>
+            <button id="fetchCringeBtn">Anime Cringe</button>
+            <button id="fetchDancesBtn">Anime Dances</button>
+            <button id="fetchKissBtn">Anime Kiss</button>
+            <button id="fetchHnekoBtn">Hentai Neko</button>
+            <button id="fetchHwaifuBtn">Hentai Waifu</button>
+        </div>
+        <div id="searchContainer">
+            <input type="text" id="searchInput" placeholder="Cari API">
+            <button id="searchButton">🔍 Cari</button>
+        </div>
+        <button id="downloadButton">Download Gambar</button>
+        <div id="searchResult"></div>
+        <div id="imageContainer">
+            <!-- Gambar akan ditampilkan di sini -->
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="#" class="active">Home</a>
+        <a href="pokemon.html">Pokemon</a>
+        <a href="karina.html">Karina</a>
+        <a href="naruto.html">Naruto</a>
+        <a href="dalle.html">DALLE</a>
+    </div>
+
+    <script>
+        async function fetchAnimeImage(url, characterName) {
+            const imageContainer = document.getElementById('imageContainer');
+            const downloadButton = document.getElementById('downloadButton');
+            imageContainer.innerHTML = '<p>📌 Wait...</p>';
+
+            try {
+                let response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                let data = await response.json();
+                let animeImage = data.url;
+
+                imageContainer.innerHTML = `
+                <img id="animeImage" src="${animeImage}" alt="${characterName}">
+                <p>*[${characterName}]*</p>
+                `;
+                downloadButton.style.display = 'block';
+                downloadButton.onclick = () => downloadImage(animeImage, characterName);
+            } catch (error) {
+                console.error('Error fetching anime image:', error);
+                imageContainer.innerHTML = '<h2> Nyalakan Data sellular </h2>';
+                downloadButton.style.display = 'none';
+            }
+        }
+
+        function downloadImage(url, characterName) {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${characterName}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        document.getElementById('fetchWaifuBtn').addEventListener('click', function() {
+            fetchAnimeImage('https://api.waifu.pics/sfw/waifu', 'Anime Waifu');
+        });
+
+        document.getElementById('fetchNekoBtn').addEventListener('click', function() {
+            fetchAnimeImage('https://api.waifu.pics/sfw/neko', 'Anime Neko');
+        });
+
+        document.getElementById('fetchMeguminBtn').addEventListener('click', function() {
+            fetchAnimeImage('https://api.waifu.pics/sfw/megumin', 'Anime Megumin');
+        });
+
+        document.getElementById('fetchCringeBtn').addEventListener('click', function() {
+            fetchAnimeImage('https://api.waifu.pics/sfw/cringe', 'Anime Cringe');
+        });
+
+        document.getElementById('fetchDancesBtn').addEventListener('click', function() {
+            fetchAnimeImage('https://api.waifu.pics/sfw/dance', 'Anime Dances');
+        });
+
+        document.getElementById('fetchKissBtn').addEventListener('click', function() {
+            fetchAnimeImage('https://api.waifu.pics/sfw/kiss', 'Anime Kiss');
+        });
+
+        document.getElementById('fetchHnekoBtn').addEventListener('click', function() {
+            fetchAnimeImage('https://api.waifu.pics/nsfw/neko', 'Hentai Neko');
+        });
+        
+        document.getElementById('fetchHwaifuBtn').addEventListener
+        ('click', function() {
+            fetchAnimeImage('https://api.waifu.pics/nsfw/waifu', 'Hentai waifu');
+        });
+
+        document.getElementById('searchButton').addEventListener('click', function() {
+            const query = document.getElementById('searchInput').value;
+            if (query) {
+                fetchAnimeImage(`https://api.waifu.pics/sfw/${query}`, query);
+            } else {
+                alert('Please enter a search query.');
+            }
+        });
+    </script>
+</body>
+</html>

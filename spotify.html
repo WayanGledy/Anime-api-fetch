@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Music Downloader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h1 {
+            margin: 0;
+        }
+        .menu-button {
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .dashboard {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            background: #ffffff;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.5);
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 1000;
+            max-height: 100%;
+            overflow-y: auto;
+        }
+        .dashboard h2 {
+            text-align: center;
+            margin-top: 0;
+        }
+        .dashboard a {
+            display: block;
+            margin: 10px 0;
+            text-align: center;
+            padding: 10px;
+            background-color: #1DB954;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .dashboard a:hover {
+            background-color: #1AA34A;
+        }
+        .dashboard .close {
+            display: block;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            background-color: #f44336;
+            color: white;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            text-align: center;
+        }
+        .input-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: calc(100% - 22px); /* Adjusted for padding and border */
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #1DB954;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+        button:hover {
+            background-color: #1AA34A;
+        }
+        #resultContainer {
+            margin-top: 20px;
+            text-align: left;
+            display: none;
+        }
+        .song-info {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+        }
+        .song-info img {
+            max-width: 100px;
+            margin-right: 20px;
+        }
+        .song-info .details {
+            display: flex;
+            align-items: center;
+        }
+        .song-info .details div {
+            margin-left: 10px;
+        }
+        .song-info button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Spotify Music Downloader</h1>
+        <div class="menu-button" onclick="toggleDashboard()">☰</div>
+    </header>
+
+    <div class="container">
+        <h3>乂 *S P O T I F Y*</h3>
+        <div id="resultContainer">
+            <div class="song-info">
+                <div class="details">
+                    <img id="songThumbnail" src="" alt="Thumbnail">
+                    <div>
+                        <p id="songTitle"><strong>Title:</strong> </p>
+                        <p id="songDuration"><strong>Duration:</strong> </p>
+                        <p id="songPopularity"><strong>Popularity:</strong> </p>
+                        <p id="songCreator"><strong>Creator:</strong> </p>
+                    </div>
+                </div>
+                <button id="downloadButton">Download Music</button>
+            </div>
+        </div>
+        <div class="input-container">
+            <input type="text" id="songInput" placeholder="Enter song name">
+            <button id="searchButton">🔍 Search</button>
+        </div>
+    </div>
+
+    <div class="dashboard" id="dashboard">
+        <div class="close" onclick="toggleDashboard()">[back]</div>
+        <h2>Dashboard</h2>
+        <a href="https://wa.me/6283834202329">WhatsApp</a>
+        <a href="https://www.facebook.com/profile.php?id=100087881746207">Facebook</a>
+        <a href="pokemon.html">API Pokemon</a>
+        <a href="dalle.html">API dalle</a>
+        <a href="index.html">Anime API</a>
+        <a href="karina.html">Karina Ai</a>
+        <a href="naruto.html">Naruto Ai</a>
+    </div>
+
+    <script>
+        function toggleDashboard() {
+            const dashboard = document.getElementById('dashboard');
+            dashboard.style.display = dashboard.style.display === 'block' ? 'none' : 'block';
+        }
+
+        document.getElementById('searchButton').addEventListener('click', async function() {
+            const songInput = document.getElementById('songInput').value.trim();
+            const resultContainer = document.getElementById('resultContainer');
+            const songThumbnail = document.getElementById('songThumbnail');
+            const songTitle = document.getElementById('songTitle');
+            const songDuration = document.getElementById('songDuration');
+            const songPopularity = document.getElementById('songPopularity');
+            const songCreator = document.getElementById('songCreator');
+            const downloadButton = document.getElementById('downloadButton');
+
+            if (!songInput) {
+                alert('Please enter a song name.');
+                return;
+            }
+
+            try {
+                const apiResponse = await fetch(`https://api.junn4.my.id/search/spotify?query=${encodeURIComponent(songInput)}`);
+                const apiData = await apiResponse.json();
+
+                if (!apiData.data || apiData.data.length === 0) {
+                    alert("No results found for your search query.");
+                    return;
+                }
+
+                const songData = apiData.data[0];
+                songTitle.innerHTML = `<strong>Title:</strong> ${songData.title}`;
+                songDuration.innerHTML = `<strong>Duration:</strong> ${songData.duration}`;
+                songPopularity.innerHTML = `<strong>Popularity:</strong> ${songData.popularity}`;
+                songCreator.innerHTML = `<strong>Creator:</strong> ${songData.creator || "Unknown"}`;
+                songThumbnail.src = songData.thumbnail || 'https://telegra.ph/file/50afb355fac55370492de.jpg';
+                resultContainer.style.display = 'block';
+
+                downloadButton.onclick = async function() {
+                    try {
+                        const downloadResponse = await fetch(`https://api.junn4.my.id/download/spotify?url=${encodeURIComponent(songData.url)}`);
+                        const downloadData = await downloadResponse.json();
+
+                        if (!downloadData.data || !downloadData.data.download) {
+                            alert("Failed to retrieve download link.");
+                            return;
+                        }
+
+                        const downloadLink = document.createElement('a');
+                        downloadLink.href = downloadData.data.download;
+                        downloadLink.download = `${songData.title}.mp3`;
+                        document.body.appendChild(downloadLink);
+                        downloadLink.click();
+                        document.body.removeChild(downloadLink);
+                    } catch (error) {
+                        console.error('Error fetching download link:', error);
+                        alert("Error fetching download link. Please try again.");
+                    }
+                };
+            } catch (error) {
+                console.error('Error fetching song data:', error);
+                alert("Error fetching song data. Please try again.");
+            }
+        });
+    </script>
+</body>
+</html>

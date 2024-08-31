@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karina AI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h1 {
+            margin: 0;
+        }
+        .menu-button {
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .dashboard {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            background: #ffffff;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.5);
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 1000;
+            max-height: 100%;
+            overflow-y: auto;
+        }
+        .dashboard h2 {
+            text-align: center;
+            margin-top: 0;
+        }
+        .dashboard a {
+            display: block;
+            margin: 10px 0;
+            text-align: center;
+            padding: 10px;
+            background-color: #6200ea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .dashboard a:hover {
+            background-color: #3700b3;
+        }
+        .dashboard .close {
+            display: block;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            background-color: #f44336;
+            color: white;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            text-align: center;
+        }
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #3700b3;
+        }
+        #responseContainer {
+            margin-top: 20px;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .message {
+            max-width: 70%;
+            padding: 10px;
+            border-radius: 10px;
+            position: relative;
+            word-wrap: break-word;
+        }
+        .user-message {
+            background-color: #e1ffc7;
+            align-self: flex-end;
+        }
+        .bot-message {
+            background-color: #ffffff;
+            align-self: flex-start;
+        }
+        .message:before {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border: 10px solid transparent;
+            border-top: 10px solid transparent;
+        }
+        .user-message:before {
+            right: -10px;
+            top: 50%;
+            border-left: 10px solid #e1ffc7;
+            transform: translateY(-50%);
+        }
+        .bot-message:before {
+            left: -10px;
+            top: 50%;
+            border-right: 10px solid #ffffff;
+            transform: translateY(-50%);
+        }
+        #promptInput {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: calc(100% - 22px); /* Adjusted for padding and border */
+            box-sizing: border-box;
+        }
+        #sendButton {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            background-color: #6200ea;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        #sendButton:hover {
+            background-color: #3700b3;
+        }
+
+        /* Styling for code highlighting */
+        pre[class*="language-"] {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow: auto;
+        }
+
+        code {
+            background: #f5f5f5;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+    <!-- Prism.js CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.css" rel="stylesheet" />
+</head>
+<body>
+    <header>
+        <h1>Karina Botsz</h1>
+        <div class="menu-button" onclick="toggleDashboard()">☰</div>
+    </header>
+
+    <div class="container">
+        <h3>[Chat Naruto]</h3>
+        <div id="responseContainer">
+            <!-- Responses will be displayed here -->
+        </div>
+        <input type="text" id="promptInput" placeholder="Enter your prompt here">
+        <button id="sendButton">🔍 Send</button>
+    </div>
+
+    <div class="dashboard" id="dashboard">
+        <div class="close" onclick="toggleDashboard()">[back]</div>
+        <h2>Dashboard</h2>
+        <a href="https://wa.me/6283834202329">WhatsApp</a>
+        <a href="https://www.facebook.com/profile.php?id=100087881746207">Facebook</a>
+        <a href="pokemon.html">API Pokemon</a>
+        <a href="dalle.html">API dalle</a>
+        <a href="index.html">Anime API</a>
+        <a href="karina.html">Karina Api</a>
+    </div>
+
+    <!-- Prism.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+
+    <script>
+        function toggleDashboard() {
+            const dashboard = document.getElementById('dashboard');
+            dashboard.style.display = dashboard.style.display === 'block' ? 'none' : 'block';
+        }
+
+        document.getElementById('sendButton').addEventListener('click', async function() {
+            const responseContainer = document.getElementById('responseContainer');
+            const promptInput = document.getElementById('promptInput');
+            const text = promptInput.value.trim();
+
+            if (!text) {
+                alert('Please enter a prompt.');
+                return;
+            }
+
+            // Add the user message to the chat
+            responseContainer.innerHTML += `<div class="message user-message">${text}</div>`;
+
+            let prompt = `
+            nama kamu sekarang alex Alex
+
+**Usia:** 28 Tahun
+profesi kamu
+**Profesi:** Senior Node.js Developer
+
+penampilammu seperti berikut
+1. **Penampilan:**
+   - **Rambut:** Pendek dan rapi, berwarna hitam pekat.
+   - **Mata:** Tajam dan fokus, dengan warna cokelat tua.
+   - **Pakaian:** Selalu mengenakan kaos berwarna gelap dengan logo dari berbagai konferensi teknologi, dipadukan dengan jeans dan sepatu kasual.
+   - **Gaya:** Cenderung sederhana namun profesional, dengan headphone yang sering terlihat di lehernya.
+keterampilanmu
+2. **Keahlian:**
+   - **Node.js:** Alex memiliki pemahaman mendalam tentang arsitektur Node.js, mampu menulis kode yang efisien dan skalabel. Dia juga memiliki kemampuan debugging yang luar biasa.
+   - **JavaScript:** Dia adalah seorang ahli dalam ES6+, memahami berbagai fitur modern JavaScript dan bagaimana menggunakannya dengan optimal.
+   - **Frameworks:** Selain Node.js, Alex juga mahir dalam Express.js, Koa.js, dan Nest.js.
+   - **Database:** Memiliki pengalaman luas dengan MongoDB, PostgreSQL, dan Redis.
+   - **DevOps:** Familiar dengan Docker, Kubernetes, CI/CD pipelines, dan juga memiliki pemahaman tentang cloud services seperti AWS dan GCP.
+   - **AI dan Machine Learning:** Meskipun fokus utamanya adalah backend development, Alex juga memiliki pengetahuan dasar tentang AI dan Machine Learning, yang memungkinkan dia untuk berkolaborasi dengan tim data scientist.
+   Kepribadianmu
+3. **Kepribadian:**
+   - **Cerdas:** Alex adalah seseorang yang sangat pintar, mampu menemukan solusi untuk masalah kompleks dengan cepat.
+   - **Teliti:** Dia selalu memperhatikan detail, memastikan bahwa setiap baris kode yang ditulisnya efisien dan bebas dari bug.
+   - **Tenang:** Dalam situasi stres atau deadline yang ketat, Alex tetap tenang dan fokus, mampu menyelesaikan tugas dengan tepat waktu.
+   - **Kolaboratif:** Meskipun dia ahli di bidangnya, Alex selalu terbuka untuk bekerja sama dengan orang lain, berbagi pengetahuan, dan membimbing junior developers.
+  Backstory Karakter:
+Alex telah bekerja di industri pengembangan perangkat lunak selama lebih dari 10 tahun. Dia memulai karirnya sebagai junior developer dan dengan cepat naik ke posisi senior karena kecerdasannya dan kemampuan belajarnya yang cepat. Alex dikenal sebagai seseorang yang dapat diandalkan dalam timnya, seringkali menyelesaikan masalah yang paling sulit dan mengarahkan timnya menuju solusi inovatif`;
+
+            try {
+                const response = await fetch(`https://api.kyuurzy.site/api/ai/aiprompt?prompt=${encodeURIComponent(prompt)}&query=${encodeURIComponent(text)}`);
+                const data = await response.json();
+
+                if (data && data.result) {
+                    // If the response contains code, split it from the rest of the text
+                    const codeRegex = /```(.*?)\n([\s\S]*?)```/g;
+                    let parts = data.result.split(codeRegex);
+                    
+                    parts.forEach((part, index) => {
+                        if (index % 3 === 0) {
+                            // Non-code text
+                            responseContainer.innerHTML += `<div class="message bot-message">${part}</div>`;
+                        } else if (index % 3 === 1) {
+                            // Language (e.g., javascript, python)
+                            const language = part.trim();
+                            const codeContent = parts[index + 1].trim();
+                            responseContainer.innerHTML += `<div class="message bot-message"><pre><code class="language-${language}">${Prism.highlight(codeContent, Prism.languages[language], language)}</code></pre></div>`;
+                        }
+                    });
+                } else {
+                    responseContainer.innerHTML += '<div class="message bot-message">Error fetching response. Please try again.</div>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                responseContainer.innerHTML += '<div class="message bot-message">Error fetching response. Please try again.</div>';
+            }
+
+            // Scroll to the bottom of the container
+            responseContainer.scrollTop = responseContainer.scrollHeight;
+
+            promptInput.value = '';
+        });
+    </script>
+</body>
+</html>
