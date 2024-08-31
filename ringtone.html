@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ringtone Downloader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .navbar {
+            background-color: #333;
+            overflow: hidden;
+        }
+        .navbar a {
+            float: left;
+            display: block;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+        .navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        .container {
+            margin: 50px auto;
+            max-width: 600px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            display: flex;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px 0 0 4px;
+        }
+        .input-group button {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        .input-group button:hover {
+            background-color: #218838;
+        }
+        .ringtone-container {
+            display: none;
+            margin-top: 20px;
+        }
+        .ringtone-container h3 {
+            margin-bottom: 10px;
+        }
+        .ringtone-item {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .ringtone-item audio {
+            margin-right: 10px;
+            width: 100%;
+            max-width: 300px;
+        }
+        .ringtone-item button {
+            padding: 5px 10px;
+            font-size: 14px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .ringtone-item button:hover {
+            background-color: #0069d9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="index.html">Home</a>
+        <a href="spotify.html">Spotify</a>
+        <a href="karina.html">Karina</a>
+        <a href="naruto.html">Naruto</a>
+        <a href="dalle.html">DALL·E</a>
+    </div>
+
+    <div class="container">
+        <h1>Ringtone Downloader</h1>
+        <div class="input-group">
+            <input type="text" id="ringtoneQuery" placeholder="Masukkan judul ringtone...">
+            <button onclick="searchRingtone()">Cari</button>
+        </div>
+        <div class="ringtone-container" id="ringtoneContainer">
+            <h3>Hasil Pencarian:</h3>
+            <div id="ringtoneList"></div>
+        </div>
+    </div>
+
+    <script>
+        async function ringtone(title) {
+            const response = await fetch('https://meloboom.com/en/search/' + title);
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const ringtoneItems = doc.querySelectorAll('#__next > main > section > div.jsx-2244708474.container > div > div > div > div:nth-child(4) > div > div > div > ul > li');
+            const hasil = [];
+
+            ringtoneItems.forEach(item => {
+                const title = item.querySelector('h4').textContent;
+                const source = 'https://meloboom.com/' + item.querySelector('a').getAttribute('href');
+                const audio = item.querySelector('audio').getAttribute('src');
+                hasil.push({ title, source, audio });
+            });
+
+            return hasil;
+        }
+
+        async function searchRingtone() {
+            const query = document.getElementById('ringtoneQuery').value;
+            if (!query) {
+                alert('Masukkan judul ringtone');
+                return;
+            }
+
+            try {
+                const hasil = await ringtone(query);
+                const ringtoneContainer = document.getElementById('ringtoneContainer');
+                const ringtoneList = document.getElementById('ringtoneList');
+
+                ringtoneList.innerHTML = ''; // Bersihkan hasil pencarian sebelumnya
+
+                if (hasil.length > 0) {
+                    ringtoneContainer.style.display = 'block';
+
+                    hasil.forEach(item => {
+                        const ringtoneItem = document.createElement('div');
+                        ringtoneItem.className = 'ringtone-item';
+
+                        const audio = document.createElement('audio');
+                        audio.controls = true;
+                        audio.src = item.audio;
+
+                        const title = document.createElement('span');
+                        title.textContent = item.title;
+
+                        const downloadButton = document.createElement('button');
+                        downloadButton.textContent = 'Unduh';
+                        downloadButton.onclick = function() {
+                            const a = document.createElement('a');
+                            a.href = item.audio;
+                            a.download = item.title + '.mp3';
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                        };
+
+                        ringtoneItem.appendChild(audio);
+                        ringtoneItem.appendChild(title);
+                        ringtoneItem.appendChild(downloadButton);
+
+                        ringtoneList.appendChild(ringtoneItem);
+                    });
+                } else {
+                    ringtoneContainer.style.display = 'none';
+                    alert('Tidak ada hasil yang ditemukan');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat mencari ringtone');
+            }
+        }
+    </script>
+</body>
+</html
