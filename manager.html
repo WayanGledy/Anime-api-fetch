@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Manager & Zip Extractor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .file-upload {
+            margin-bottom: 20px;
+        }
+        .file-upload input {
+            display: block;
+            margin-bottom: 10px;
+        }
+        #fileManager {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e0e0e0;
+            border-radius: 6px;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        li {
+            margin: 5px 0;
+            padding: 8px;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>File Manager & Zip Extractor</h1>
+
+        <!-- Form untuk mengunggah file .zip -->
+        <div class="file-upload">
+            <h3>Upload & Extract Zip File</h3>
+            <input type="file" id="zipFileInput" accept=".zip">
+            <button onclick="extractZip()">Extract Zip</button>
+        </div>
+
+        <!-- Form untuk mengunggah file dari perangkat -->
+        <div class="file-upload">
+            <h3>Upload File to Directory</h3>
+            <input type="file" id="fileInput">
+            <button onclick="uploadFile()">Upload File</button>
+        </div>
+
+        <!-- Tempat untuk menampilkan isi file manager -->
+        <h3>File Manager</h3>
+        <div id="fileManager"></div>
+    </div>
+
+    <script>
+        let fileSystem = {}; // Root direktori untuk menyimpan file
+
+        // Fungsi untuk mengekstrak file zip
+        async function extractZip() {
+            const fileInput = document.getElementById('zipFileInput');
+            if (!fileInput.files.length) {
+                alert('Please select a zip file to extract');
+                return;
+            }
+            const zipFile = fileInput.files[0];
+
+            // Membaca file zip dan menggunakannya untuk mengekstrak isinya
+            const JSZip = await import('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js');
+            const zip = new JSZip();
+            const zipContent = await zip.loadAsync(zipFile);
+            
+            // Menyimpan setiap file dan folder ke dalam fileSystem
+            for (const fileName in zipContent.files) {
+                const file = zipContent.files[fileName];
+                if (!file.dir) {
+                    const content = await file.async('blob');
+                    saveFileToSystem(fileName, content);
+                } else {
+                    createFolder(fileName);
+                }
+            }
+
+            // Memperbarui tampilan file manager
+            updateFileManager();
+        }
+
+        // Fungsi untuk mengunggah file dari perangkat
+        function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files.length) {
+                alert('Please select a file to upload');
+                return;
+            }
+            const file = fileInput.files[0];
+            saveFileToSystem(file.name, file);
+            updateFileManager();
+        }
+
+        // Fungsi untuk menyimpan file ke "root" fileSystem
+        function saveFileToSystem(fileName, file) {
+            fileSystem[fileName] = file;
+        }
+
+        // Fungsi untuk membuat folder di fileSystem (jika diperlukan)
+        function createFolder(folderName) {
+            if (!fileSystem[folderName]) {
+                fileSystem[folderName] = {};
+            }
+        }
+
+        // Fungsi untuk memperbarui tampilan file manager
+        function updateFileManager() {
+            const fileManagerDiv = document.getElementById('fileManager');
+            fileManagerDiv.innerHTML = ''; // Reset konten
+
+            const ul = document.createElement('ul');
+
+            // Loop melalui file yang ada di fileSystem
+            for (const key in fileSystem) {
+                const li = document.createElement('li');
+                li.textContent = key;
+                ul.appendChild(li);
+            }
+
+            fileManagerDiv.appendChild(ul);
+        }
+
+    </script>
+    
+</body>
+</html
