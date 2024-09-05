@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Effect Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Image Effect Generator</h1>
+        <form id="effectForm">
+            <label for="mode">Pilih Mode:</label>
+            <select id="mode" required>
+                <option value="glitchtext">Glitch Text</option>
+                <option value="writetext">Write Text</option>
+                <option value="advancedglow">Advanced Glow</option>
+                <option value="typographytext">Typography Text</option>
+                <option value="pixelglitch">Pixel Glitch</option>
+                <option value="neonglitch">Neon Glitch</option>
+                <!-- Tambahkan opsi lainnya sesuai case -->
+            </select>
+
+            <label for="text">Masukkan Teks:</label>
+            <input type="text" id="text" placeholder="Masukkan teks Anda..." required>
+
+            <button type="submit">Generate</button>
+        </form>
+
+        <div class="image-output">
+            <img id="generatedImage" alt="Hasil gambar akan ditampilkan di sini">
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+          </html
